@@ -1,25 +1,40 @@
 import fs from "fs";
-import pdfjsLib from "pdfjs-dist/legacy/build/pdf.js"; // use "legacy" after installing version 2.x
+import pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
 
-async function readPdf(filePath) {
+async function readPdf(filePath, startPage, endPage) {
   try {
     const data = new Uint8Array(fs.readFileSync(filePath));
     const loadingTask = pdfjsLib.getDocument({ data });
     const pdf = await loadingTask.promise;
 
-    let fullText = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items.map((item) => item.str).join(" ");
-      fullText += pageText + "\n";
+    // Safety checks
+    const from = Math.max(1, startPage);
+    const to = Math.min(pdf.numPages, endPage);
+
+    if (from > to) {
+      throw new Error("Invalid page range");
     }
 
-    console.log("Extracted text:\n", fullText);
+    let extractedText = "";
+
+    for (let i = from; i <= to; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(" ");
+      extractedText += pageText + "\n\n";
+    }
+
+    console.log(`Extracted text (pages ${from}-${to}):\n`, extractedText);
+    return extractedText;
+
   } catch (err) {
     console.error("Failed to read PDF:", err);
   }
 }
 
-// Change to your PDF path
-readPdf("C:/Users/super/Downloads/random_paragraph.pdf");
+// ✅ Extract pages 2–3 only
+readPdf(
+  "C:/Users/super/Downloads/random_paragraph.pdf",
+  2,
+  3
+);

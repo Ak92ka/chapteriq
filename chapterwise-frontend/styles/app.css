@@ -167,3 +167,22 @@ background-color: #8172F8;
 .span-message-upload {
   font-weight: 700;
 }
+
+.download-icon {
+    width: 24px;
+    height: 24px;
+    padding-right: 8px;
+}
+
+.pdf-download-button {
+  color: #fff;
+    cursor: pointer;
+    background-color: #FF3434;
+    border: 1px solid #FF3434;
+    border-radius: 20px;
+    margin: 16px auto 32px;
+    padding: 14px 18px;
+    font-size: 20px;
+    font-weight: 700;
+    display: block;
+}

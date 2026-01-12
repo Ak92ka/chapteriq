@@ -187,21 +187,43 @@ A: [clear, direct answer in 2–3 sentences]
 
 app.post("/api/extract-text", upload.single("file"), async (req, res) => {
   try {
-    const fileBuffer = req.file.buffer; // directly from memory
-    const data = new Uint8Array(fileBuffer);
-    const pdf = await getDocument({ data }).promise;
-
-    let fullText = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      fullText += content.items.map((item) => item.str).join(" ") + "\n";
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
-    res.status(200).json({ text: fullText });
+    const startPage = parseInt(req.body.startPage || "1", 10);
+    const endPage = parseInt(req.body.endPage || "9999", 10);
+
+    // ✅ CORRECT: use buffer directly
+    const data = new Uint8Array(req.file.buffer);
+
+    const loadingTask = getDocument({ data });
+    const pdf = await loadingTask.promise;
+
+    const from = Math.max(1, startPage);
+    const to = Math.min(pdf.numPages, endPage);
+
+    if (from > to) {
+      return res.status(400).json({ error: "Invalid page range" });
+    }
+
+    let extractedText = "";
+
+    for (let i = from; i <= to; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(" ");
+      extractedText += pageText + "\n\n";
+    }
+
+    res.json({
+      pages: `${from}-${to}`,
+      text: extractedText,
+    });
+
   } catch (err) {
-    console.error("PDF parse error:", err);
-    res.status(500).json({ error: "Failed to extract text from PDF." });
+    console.error("PDF extraction error:", err);
+    res.status(500).json({ error: "Failed to extract text from PDF" });
   }
 });
 
