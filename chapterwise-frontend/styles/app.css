@@ -186,3 +186,32 @@ background-color: #8172F8;
     font-weight: 700;
     display: block;
 }
+
+.page-inputs {
+  display: flex;
+  gap: 14px;           /* space between inputs and "to" */
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.page-inputs input {
+  width: 40%;
+  min-width: 110px;
+  padding: 12px 14px;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.page-inputs span {
+  font-weight: 600;
+  color: #555;
+  padding: 0 6px;
+}
+
+.Checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

@@ -27,6 +27,7 @@ export default function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
 const [startPage, setStartPage] = useState("");
 const [endPage, setEndPage] = useState("");
+const [downloadWholePdf, setDownloadWholePdf] = useState(false);
 const [pdfMode, setPdfMode] = useState(false);
 const [pdfSubmitted, setPdfSubmitted] = useState(false);
 const [originalChapter, setOriginalChapter] = useState("");
@@ -37,11 +38,15 @@ const [originalChapter, setOriginalChapter] = useState("");
 
 const handleSummarize = async () => {
   // ---------- PDF PAGE EXTRACTION ----------
-  if (pdfMode && uploadedFile) {
-  if (!startPage || !endPage || startPage < 1 || endPage < startPage) {
-    setAiOutput("Please enter a valid page range.");
-    setIsAiOutput(false);
-    return;
+if (pdfMode && uploadedFile) {
+
+  // If not downloading whole PDF, validate page range
+  if (!downloadWholePdf) {
+    if (!startPage || !endPage || startPage < 1 || endPage < startPage) {
+      setAiOutput("Please enter a valid page range.");
+      setIsAiOutput(false);
+      return;
+    }
   }
 
   setLoading(true);
@@ -50,8 +55,12 @@ const handleSummarize = async () => {
   try {
     const formData = new FormData();
     formData.append("file", uploadedFile);
-    formData.append("startPage", startPage);
-    formData.append("endPage", endPage);
+
+    // Only send pages if user selected a range
+    if (!downloadWholePdf) {
+      formData.append("startPage", startPage);
+      formData.append("endPage", endPage);
+    }
 
     const res = await fetch("http://localhost:5000/api/extract-text", {
       method: "POST",
@@ -67,12 +76,12 @@ const handleSummarize = async () => {
     setUploaded(false);
     setStartPage("");
     setEndPage("");
+    setDownloadWholePdf(false); // reset checkbox
 
     // Send extracted pages directly to notes generation
-    setOriginalChapter(data.text);  // store extracted text
+    setOriginalChapter(data.text);
     setPdfSubmitted(true);
     await generateNotes(data.text, true);
-   
 
   } catch (err) {
     console.error(err);
@@ -287,38 +296,52 @@ const handleDownloadPDF = () => {
   const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
   const pageHeight = doc.internal.pageSize.getHeight() - margin * 2;
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-
-  // -------- Add AI Notes --------
-  const aiLines = doc.splitTextToSize(aiOutput, pageWidth);
   let y = margin;
 
-  aiLines.forEach((line) => {
-    if (y + lineHeight > pageHeight + margin) {
-      doc.addPage();
-      y = margin;
-    }
-    doc.text(line, margin, y);
-    y += lineHeight;
-  });
+  const headings = [
+    "Chapter Name:",
+    "Overview:",
+    "Chapter Summary:",
+    "Key Concepts:",
+    "Important Definitions:",
+    "Exam Focus:",
+    "Original Chapter:"
+  ];
+
+  const addText = (text) => {
+    const lines = text.split("\n");
+
+    lines.forEach((rawLine) => {
+      const line = rawLine.trim();
+      const isHeading = headings.some((h) => line.startsWith(h));
+
+      doc.setFont("helvetica", isHeading ? "bold" : "normal");
+      doc.setFontSize(12); // <-- keep font size 12
+
+      const wrapped = doc.splitTextToSize(line, pageWidth);
+
+      wrapped.forEach((wLine) => {
+        if (y + lineHeight > pageHeight + margin) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(wLine, margin, y);
+        y += lineHeight;
+      });
+    });
+  };
+
+  // -------- Add AI Notes --------
+  addText(aiOutput);
 
   // -------- Add Original Chapter --------
   if (originalChapter) {
-    const chapterLines = doc.splitTextToSize("\n\n\n\n\n\nOriginal Chapter:\n\n" + originalChapter, pageWidth);
-
-    chapterLines.forEach((line) => {
-      if (y + lineHeight > pageHeight + margin) {
-        doc.addPage();
-        y = margin;
-      }
-      doc.text(line, margin, y);
-      y += lineHeight;
-    });
+    addText("\n\nOriginal Chapter:\n\n" + originalChapter);
   }
 
   doc.save("ChapterNotes.pdf");
 };
+
 
 
   return (
@@ -351,26 +374,41 @@ const handleDownloadPDF = () => {
     <p><strong>📄 {uploadedFile.name}</strong></p>
 
     <div className="page-inputs">
-      <input
-        type="number"
-        placeholder="Start page"
-        value={startPage}
-        onChange={(e) => setStartPage(e.target.value)}
-        min="1"
-      />
-      <span>to</span>
-      <input
-        type="number"
-        placeholder="End page"
-        value={endPage}
-        onChange={(e) => setEndPage(e.target.value)}
-        min="1"
-      />
-    </div>
+  <input
+    type="number"
+    placeholder="Start page"
+    value={startPage}
+    onChange={(e) => setStartPage(e.target.value)}
+    min="1"
+    disabled={downloadWholePdf}
+  />
+
+  <span>to</span>
+
+  <input
+    type="number"
+    placeholder="End page"
+    value={endPage}
+    onChange={(e) => setEndPage(e.target.value)}
+    min="1"
+    disabled={downloadWholePdf}
+  />
+</div>
+
 
     <p className="page-hint">
       Only selected pages will be summarized.
     </p>
+
+    <div className="checkbox-container">
+  <input
+    type="checkbox"
+    id="wholePdf"
+    checked={downloadWholePdf}
+    onChange={(e) => setDownloadWholePdf(e.target.checked)}
+  />
+  <label htmlFor="wholePdf">Summarize entire PDF</label>
+</div>
   </div>
 ) : (
   // -------- Normal text input --------
