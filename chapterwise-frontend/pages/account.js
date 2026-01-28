@@ -5,16 +5,55 @@ import { useEffect, useState } from "react";
 
 export default function Account() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Function to fetch latest user info
+const refreshUser = async () => {
+  const savedUser = JSON.parse(localStorage.getItem("user"));
+  console.log("Before API:", savedUser);
+
+  if (!savedUser) return;
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/me/${savedUser.id}`);
+    const updatedUser = await res.json();
+    console.log("API response:", updatedUser);
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // On component mount, refresh user data
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) setUser(savedUser);
+    refreshUser();
   }, []);
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
     const d = new Date(dateStr);
+    if (isNaN(d)) return "-";  // handles invalid date strings
     return d.toLocaleDateString();
   };
+
+  if (loading) {
+    return (
+      <>
+        <Head>
+          <title>Account</title>
+        </Head>
+        <Header />
+        <div className="account-container">
+          <h2>Loading account info...</h2>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   if (!user) {
     return (
@@ -59,13 +98,19 @@ export default function Account() {
               <p>
                 <strong>Subscribed from:</strong> {formatDate(user.subscribedAt)}
               </p>
+              <p>
+                <strong>Subscribed until:</strong> {formatDate(user.subscribedUntil)}
+              </p>
             </>
           ) : (
             <>
               <p>
                 <strong>Status:</strong> Not subscribed
               </p>
-              <button className="subscribe-btn">
+              <button
+                className="subscribe-btn"
+                onClick={refreshUser} // For testing / manually refresh
+              >
                 Subscribe (coming soon)
               </button>
             </>

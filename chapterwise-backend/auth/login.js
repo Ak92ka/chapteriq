@@ -17,11 +17,12 @@ export default async function loginHandler(req, res) {
   }
 
   res.status(200).json({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    subscribed: !!user.subscribed,
-    subscribedAt: user.subscribedAt,
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  subscribed: user.subscribed,
+  subscribedAt: user.subscribedAt,
+  subscribedUntil: user.subscribedUntil,
     dailyCharacters: user.dailyCharacters,
     monthlyCharacters: user.monthlyCharacters,
   });

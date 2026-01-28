@@ -15,9 +15,10 @@ export default async function signupHandler(req, res) {
   const hashed = await bcrypt.hash(password, 10);
   const id = Date.now().toString();
 
+  // No automatic subscription
   db.prepare(`
-    INSERT INTO users (id, name, email, password)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO users (id, name, email, password, subscribed, subscribedAt, subscribedUntil)
+    VALUES (?, ?, ?, ?, 0, NULL, NULL)
   `).run(id, name, email, hashed);
 
   res.status(201).json({ message: "User created" });

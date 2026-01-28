@@ -39,6 +39,16 @@ function resetUsage(user) {
 }
 
 
+function isSubscriptionActive(user) {
+  if (!user.subscribed) return false;
+  if (!user.subscribedUntil) return false;
+
+  const now = new Date();
+  const until = new Date(user.subscribedUntil);
+
+  return until > now;
+}
+
 app.post("/api/generate-notes", async (req, res) => {
   try {
     const { text, userId } = req.body;
@@ -60,12 +70,23 @@ app.post("/api/generate-notes", async (req, res) => {
       // Reset usage
       resetUsage(user);
 
+      // AUTO EXPIRE CHECK
+      if (!isSubscriptionActive(user)) {
+        db.prepare(`
+          UPDATE users
+          SET subscribed = 0
+          WHERE id = ?
+        `).run(userId);
+
+        user.subscribed = 0; // update in memory too
+      }
+
       // Limits
       const freeDailyLimit = 1000;
       const freeMonthlyLimit = 30000;
       const subMonthlyLimit = 50000;
 
-      if (!user.subscribed) {
+      if (!isSubscriptionActive(user)) {
         if (user.dailyCharacters + textLen > freeDailyLimit) {
           return res.status(429).json({ error: "Daily limit reached." });
         }
@@ -82,7 +103,7 @@ app.post("/api/generate-notes", async (req, res) => {
       user.dailyCharacters += textLen;
       user.monthlyCharacters += textLen;
 
-      // Save to SQLite
+      // Save usage to SQLite
       db.prepare(`
         UPDATE users
         SET dailyCharacters = ?, monthlyCharacters = ?, dailyReset = ?, monthlyReset = ?
@@ -95,6 +116,7 @@ app.post("/api/generate-notes", async (req, res) => {
         userId
       );
     }
+
   // ----------------- OpenAI call -----------------
     const response = await openai.responses.create({
   model: "gpt-4.1-mini",
@@ -176,6 +198,41 @@ const notes = response.output_text ?? "No output generated.";
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.post("/api/grant-subscription", (req, res) => {
+  const { userId } = req.body;
+  const now = new Date();
+  const thirtyDaysLater = new Date(now.getTime() + 30*24*60*60*1000);
+
+  db.prepare(`
+    UPDATE users
+    SET subscribed = 1, subscribedAt = ?, subscribedUntil = ?
+    WHERE id = ?
+  `).run(now.toISOString(), thirtyDaysLater.toISOString(), userId);
+
+  res.json({ message: "Subscription granted for 30 days" });
+});
+
+
+app.get("/api/me/:userId", (req, res) => {
+  const user = db
+    .prepare(`
+      SELECT id, name, email, subscribed, subscribedAt, subscribedUntil
+      FROM users
+      WHERE id = ?
+    `)
+    .get(req.params.userId);
+
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  // Ensure nulls are properly set
+  user.subscribedAt = user.subscribedAt || null;
+  user.subscribedUntil = user.subscribedUntil || null;
+
+  res.json(user);
+});
+
+
 
 // ----------------- PDF Extraction Endpoint -----------------
 
