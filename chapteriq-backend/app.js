@@ -227,7 +227,7 @@ app.post("/api/generate-notes", async (req, res) => {
 
   // ----------------- OpenAI call -----------------
     const response = await openai.responses.create({
-  model: "gpt-4.1-mini",
+  model: "gpt-4.1-nano",
   input: [
         { role: "system", content: `You are an AI study assistant.
 

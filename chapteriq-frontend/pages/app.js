@@ -330,8 +330,11 @@ const handleReset = () => {
     }
   };
 
-const handleDownloadPDF = () => {
+const handleDownloadPDF = async () => {
   if (!aiOutput) return;
+
+  // Dynamically import jspdf and get the default export
+  const { jsPDF } = await import("jspdf"); // <-- note: destructure jsPDF here
 
   const doc = new jsPDF({
     orientation: "portrait",
@@ -364,7 +367,7 @@ const handleDownloadPDF = () => {
       const isHeading = headings.some((h) => line.startsWith(h));
 
       doc.setFont("helvetica", isHeading ? "bold" : "normal");
-      doc.setFontSize(12); // <-- keep font size 12
+      doc.setFontSize(12);
 
       const wrapped = doc.splitTextToSize(line, pageWidth);
 
@@ -389,6 +392,7 @@ const handleDownloadPDF = () => {
 
   doc.save("ChapterNotes.pdf");
 };
+
   return (
     <>
       <SEO
