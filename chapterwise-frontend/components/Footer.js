@@ -18,13 +18,14 @@ export default function Footer() {
       <a className="p-footer-14">Cookie settings</a>
       <p className="p-footer-14 copyright">@ 2026 ChapterIQ</p>
       <ul>
-        <li className="list-headline">Company</li>
-         <a href="about-us"><li>About us</li></a>
-        <a href="pricing"><li>Pricing</li></a>
-        <a href="blog"><li>Blog</li></a>
-        <a href="contact"><li>Contact</li></a>
-        <a href="terms-privacy"><li>Terms & privacy</li></a>    
-      </ul>
+  <li className="list-headline">Company</li>
+  <li><Link href="about-us">About us</Link></li>
+  <li><Link href="pricing">Pricing</Link></li>
+  <li><Link href="blog">Blog</Link></li>
+  <li><Link href="contact">Contact</Link></li>
+  <li><Link href="terms-privacy">Terms & privacy</Link></li>
+</ul>
+
     </div>
   );
 }

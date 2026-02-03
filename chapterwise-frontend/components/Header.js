@@ -2,6 +2,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export default function Header() {
@@ -22,42 +23,39 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-  try {
-    // Call backend logout endpoint
-    await fetch("http://localhost:5000/auth/logout", {
-      method: "POST",
-      credentials: "include", // important to send cookies
-    });
+    try {
+      // Call backend logout endpoint
+      await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include", // important to send cookies
+      });
 
-    // Clear localStorage
-    localStorage.removeItem("user");
-    localStorage.removeItem("userId"); 
-    setUser(null);
+      // Clear localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("userId");
+      setUser(null);
 
-    // Redirect to home
-    window.location.href = "/";
-  } catch (err) {
-    console.error("Logout failed:", err);
-  }
-};
-
+      // Redirect to home
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <header className="header-container">
       <Link href="/">
-        <img
-          className="logo-header"
+        <Image
           src="/ChapterWise_logo.svg"
-          alt="ChapterWise logo"
+          alt="ChapterIQ logo"
           width={130}
           height={60}
+          priority // optional for logo
         />
       </Link>
-
       <a href="/app" className="header-cta">
         TRY free
       </a>
-
       <button
         className="hamburger-btn"
         aria-label="Open menu"
@@ -88,14 +86,30 @@ export default function Header() {
         </div>
 
         <nav className="mobile-nav">
-          <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link href="/account" onClick={() => setMenuOpen(false)}>Account</Link>
-          <Link href="/app" onClick={() => setMenuOpen(false)}>Upload Chapter</Link>
-          <Link href="/about-us" onClick={() => setMenuOpen(false)}>About us</Link>
-          <Link href="/pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
-          <Link href="/blog" onClick={() => setMenuOpen(false)}>Blog</Link>
-          <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
-          <Link href="/terms-privacy" onClick={() => setMenuOpen(false)}>Terms & privacy</Link>
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link href="/account" onClick={() => setMenuOpen(false)}>
+            Account
+          </Link>
+          <Link href="/app" onClick={() => setMenuOpen(false)}>
+            Upload Chapter
+          </Link>
+          <Link href="/about-us" onClick={() => setMenuOpen(false)}>
+            About us
+          </Link>
+          <Link href="/pricing" onClick={() => setMenuOpen(false)}>
+            Pricing
+          </Link>
+          <Link href="/blog" onClick={() => setMenuOpen(false)}>
+            Blog
+          </Link>
+          <Link href="/contact" onClick={() => setMenuOpen(false)}>
+            Contact
+          </Link>
+          <Link href="/terms-privacy" onClick={() => setMenuOpen(false)}>
+            Terms & privacy
+          </Link>
         </nav>
 
         {/* 👇 AUTH SECTION */}
@@ -105,16 +119,16 @@ export default function Header() {
               <p className="welcome-text">
                 Welcome, <strong>{user.name}</strong> 👋
               </p>
-              <button
-                onClick={handleLogout}
-                className="logout-button"
-              >
+              <button onClick={handleLogout} className="logout-button">
                 Log out
               </button>
             </div>
           ) : (
             <>
-              <a href="/signup" className="account-button create-account-button">
+              <a
+                href="/signup"
+                className="account-button create-account-button"
+              >
                 Create Account
               </a>
               <a href="/login" className="account-button login-button">

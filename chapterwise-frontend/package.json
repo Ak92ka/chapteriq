@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build && node lib/generate-sitemap.js",
     "start": "next start",
-      "generate-sitemap": "node lib/generate-sitemap.js"
+    "generate-sitemap": "node lib/generate-sitemap.js",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.9",
@@ -37,6 +38,8 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6",
+    "cross-env": "^10.1.0",
     "prisma": "^7.3.0"
   }
 }

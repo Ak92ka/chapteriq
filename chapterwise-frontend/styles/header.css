@@ -14,7 +14,7 @@
 
 .header-cta {
     color: #fff;
-    background-color: #8172F8;
+    background-color: #5B3CB2;
     border-radius: 10px;
     padding: 8px 24px;
     font-size: 14px;
@@ -99,7 +99,7 @@
 
 .slider-menu-cta {
   color: #fff;
-    background-color: #8172f8;
+    background-color: #5B3CB2;
     border-radius: 10px;
     padding: 9px 12px;
     font-size: 12px;
@@ -135,11 +135,13 @@
 }
 
 .create-account-button {
-  background-color: #8172F8;
+  background-color: #4A2EA0; /* darker, primary CTA */
+  color: #fff;
 }
 
 .login-button {
-  background-color: #B1A8FB;
+  background-color: #6B4EF0; /* lighter than create-account */
+  color: #fff;
 }
 
 .welcome-box {

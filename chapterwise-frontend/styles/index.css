@@ -3,6 +3,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0 20px 32px 20px;
+   min-height: 500px; 
 }
 
 .tagline1 {
@@ -29,7 +30,7 @@
 }
 
 .cta-app {
-  background-color: #8172F8;
+  background-color: #5B3CB2;
   padding: 12px 24px;   
   border-radius: 10px;
   color: #fff;
@@ -43,7 +44,7 @@
   font-size: 13px;
   font-style: italic;
   line-height: 1.5;
-  color: #D3D3D3;
+  color: #6E6E6E;
   text-align: center;
 }
 
