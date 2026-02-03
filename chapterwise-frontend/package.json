@@ -7,7 +7,7 @@
     "build": "next build && node lib/generate-sitemap.js",
     "start": "next start",
     "generate-sitemap": "node lib/generate-sitemap.js",
-    "analyze": "cross-env ANALYZE=true next build"
+    "analyze": "cross-env ANALYZE=true next build --webpack"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.9",
@@ -34,7 +34,6 @@
     "pdfjs-dist": "^5.4.530",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "swiper": "^12.0.3",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {

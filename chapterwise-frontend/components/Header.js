@@ -1,6 +1,7 @@
 "use client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -41,6 +42,11 @@ export default function Header() {
       console.error("Logout failed:", err);
     }
   };
+
+  const FontAwesomeIcon = dynamic(
+  () => import("@fortawesome/react-fontawesome").then(mod => mod.FontAwesomeIcon),
+  { ssr: false }
+);
 
   return (
     <header className="header-container">

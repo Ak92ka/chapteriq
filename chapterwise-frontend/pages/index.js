@@ -1,10 +1,10 @@
-import { useState } from "react";
-import Head from "next/head";
+// import { useState } from "react";
+// import Head from "next/head";
 import Header from "@/components/Header.js";
 import Footer from "@/components/Footer.js";
 import SEO from "@/components/SEO";
 
-export default function Home({title, description, url, image}) {
+export default function Home() {
   return (
     <>
     <SEO
