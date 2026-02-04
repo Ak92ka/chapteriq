@@ -1,20 +1,8 @@
-import Database from "better-sqlite3";
+import pkg from "pg";
+const { Pool } = pkg;
 
-const db = new Database("database.sqlite");
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL, // Railway Postgres URL
+});
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    email TEXT UNIQUE,
-    password TEXT,
-    subscribed INTEGER DEFAULT 0,
-    subscribedAt TEXT,
-    dailyCharacters INTEGER DEFAULT 0,
-    dailyReset TEXT,
-    monthlyCharacters INTEGER DEFAULT 0,
-    monthlyReset TEXT
-  )
-`);
-
-export default db;
+export default pool;
