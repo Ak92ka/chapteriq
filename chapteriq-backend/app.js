@@ -153,34 +153,17 @@ async function querySingle(text, params) {
 }
 
 // ---------------- CORS & Middleware ----------------
+import cors from "cors";
+
 const allowedOrigins = [
   "http://localhost:3000",
   "https://chapteriq.vercel.app",
 ];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Authorization, Content-Type"
-  );
-
-  // ✅ Handle preflight
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true, // ✅ allow cookies
+}));
 
 // app.use(cors({
 //   // origin: process.env.FRONTEND_URL || "https://chapteriq.vercel.app" || "https://localhost3000.com",
