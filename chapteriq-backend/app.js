@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import OpenAI from "openai";
 import pkg from "pdfjs-dist/legacy/build/pdf.js";
 import multer from "multer";
+const upload = multer({ storage: multer.memoryStorage() });
 import Stripe from "stripe";
 import bodyParser from "body-parser";
 import jwt from "jsonwebtoken";
