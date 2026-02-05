@@ -161,7 +161,9 @@ const generateNotes = async (chapterText, fromPDF = false) => {
         guestUsage.used = 0;
       }
 
-      const guestDailyLimit = 1000;
+      // const guestDailyLimit = 1000;
+      const guestDailyLimit = 1000000; // dev
+
 
       if ((guestUsage.used + chapterText.length) > guestDailyLimit) {
         setAiOutput("Guest limit reached. Please signup for more usage.");
