@@ -37,8 +37,8 @@ const id = Date.now().toString(); // or use UUID for production
 // Insert new user
 await db.query(
   `INSERT INTO users (id, name, email, password, subscribed, subscribedAt, subscribedUntil)
-   VALUES ($1, $2, $3, $4, 0, NULL, NULL)`,
-  [id, name, email, hashed]
+   VALUES ($1, $2, $3, $4, $5, NULL, NULL)`,
+  [id, name, email, hashed, false]
 );
 
 res.status(201).json({ message: "User created" });

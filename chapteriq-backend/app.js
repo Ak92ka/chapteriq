@@ -277,14 +277,14 @@ app.post("/auth/reset-password", resetPassword);
 app.post("/auth/logout", logoutHandler);
 
 
-app.get("/test-db", async (req, res) => {
-  try {
-    const result = await db.query("SELECT 1 AS ok");
-    res.json({ db: result.rows[0] });
-  } catch (err) {
-    console.error("DB connection error:", err);
-    res.status(500).json({ error: "Cannot connect to DB", details: err.message });
-  }
-});
+// app.get("/test-db", async (req, res) => {
+//   try {
+//     const result = await db.query("SELECT 1 AS ok");
+//     res.json({ db: result.rows[0] });
+//   } catch (err) {
+//     console.error("DB connection error:", err);
+//     res.status(500).json({ error: "Cannot connect to DB", details: err.message });
+//   }
+// });
 
 export default app;
